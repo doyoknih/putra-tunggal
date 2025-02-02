@@ -62,6 +62,6 @@ jobs:
       - run: npm ci --legacy-peer-deps
       - run: npm run build --if-present
       - name: Change directory
-        run: cd /home/doyok/actions-runner/_work/putra-tunggal/putra-tunggal
+        run: cd /home/doyok/.nvm/versions/node/v20.17.0/bin/pm2
       - run: npm run build
       - run: pm2 restart 0
