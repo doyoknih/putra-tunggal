@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const dev = process.env.NODE_ENV !== "production";
-const hostname = dev ? "localhost" : "147.93.0.221";
+const hostname = dev ? "localhost" : "46.28.44.90";
 const port = 3001;
 // when using middleware `hostname` and `port` must be provided below
 const app = next({ dev, hostname, port });
