@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  img {
+    @apply block object-cover w-full h-full;
+  }
+
+  .Container {
+    @apply px-5 py-14 md:py-16 lg:py-24 md:px-10 lg:px-16;
+  }
+
+  .ContainerX {
+    @apply px-5 md:px-10 lg:px-16;
+  }
+  .ContainerY {
+    @apply py-14 md:py-16 lg:py-24;
+  }
+  .ContainerT {
+    @apply pt-14 md:pt-16 lg:pt-24;
+  }
+
+  .titleHighlight {
+    @apply text-lg md:text-2xl font-semibold text-primary;
+  }
+
+  .titleSection {
+    @apply text-lg md:text-xl font-semibold;
+  }
+
+  .titleContent {
+    @apply text-base font-semibold;
+  }
+  p {
+    @apply text-sm;
+  }
+  .badge {
+    @apply bg-primary/5 rounded-full w-max mx-auto px-4 py-2;
+  }
+
+  :root {
+    --radius: 0.5rem;
+  }
+}
+
+* {
+  scrollbar-width: none !important;
+}
+
+/* carousel home */
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-pagination-bullet {
+  background: #23435c !important;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  color: rgba(0, 0, 0, 20%) !important;
+}
+/* end carousel home */
+
+/* carousel service */
+.swiper-service .swiper-button-next::after,
+.swiper-service .swiper-button-prev::after {
+  font-size: 20px !important;
+  color: black !important;
+}
+/* end carousel service */

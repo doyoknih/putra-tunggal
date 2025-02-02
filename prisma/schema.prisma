@@ -1,0 +1,130 @@
+generator client {
+  provider        = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EnumRole {
+  User
+  Dokter
+  Admin
+}
+
+model Role {
+  id    String   @id @default(cuid())
+  role  EnumRole
+  users User[]
+}
+
+model User {
+  id            String     @id @default(cuid())
+  roleId        String
+  email         String     @unique
+  namaLengkap   String
+  alamat        String?
+  noTlp         String?
+  jenis_kelamin String?
+  tanggal_lahir String?
+  foto          String?
+  str           String?
+  password      String
+  role          Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  Service       Service[]
+  Order         Order[]
+  Chat          Chat[]
+  RoomUser      RoomUser[]
+  Testimoni     Testimoni[]
+}
+
+model Service {
+  id          String      @id @default(cuid())
+  namaService String
+  harga       Int
+  dokterId    String
+  dokter      User        @relation(fields: [dokterId], references: [id])
+  OrderItem   OrderItem[]
+  Room        Room[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  serviceId String
+  qty       Int
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  service   Service @relation(fields: [serviceId], references: [id])
+}
+
+enum EnumPaymentStatus {
+  Pending
+  Success
+  Failed
+}
+
+enum EnumLayanan {
+  Online
+  Offline
+}
+
+model Order {
+  id              String            @id @default(cuid())
+  userId          String
+  total           Int?
+  redirectUrl     String?
+  time            String?
+  layanan         EnumLayanan       @default(Online)
+  createdAt       DateTime          @default(now())
+  status          EnumPaymentStatus? @default(Pending)
+  user            User              @relation(fields: [userId], references: [id])
+  orderItem       OrderItem[]
+}   
+
+model Room {
+  id          String     @id @default(cuid())
+  serviceId   String
+  lastMessage String
+  expiredDate DateTime
+  service     Service    @relation(fields: [serviceId], references: [id])
+  Chat        Chat[]
+  RoomUser    RoomUser[]
+}
+
+model RoomUser {
+  roomId String
+  userId String
+  room   Room   @relation(fields: [roomId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@id([roomId, userId])
+}
+
+model Chat {
+  id        String   @id @default(cuid())
+  roomId    String
+  senderId  String
+  pesan     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @db.Timestamp(0)
+  pengirim  User     @relation(fields: [senderId], references: [id])
+  Room      Room     @relation(fields: [roomId], references: [id])
+}
+
+model Article {
+  id      String @id @default(cuid())
+  title   String
+  desc    String @db.Text
+  image   String
+  date    String?
+
+  @@map("Article")
+}
+
+model Testimoni {
+  id          String @id @default(cuid())
+  userId      String
+  testimoni   String
+  user        User   @relation(fields: [userId], references: [id])
+}
