@@ -3,7 +3,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { TypeBodyLogin } from "./types";
 import { fetchAuth, fetchLogout } from "./fetcher";
-import { useRouter } from "next/navigation";
 
 type MUTATION_TYPE =
   | { type: "login"; body: TypeBodyLogin }
@@ -11,7 +10,6 @@ type MUTATION_TYPE =
   | { type: "logout"; body: "" };
 
 const useMutationAuth = () => {
-  const router = useRouter();
   const mutation = useMutation({
     mutationKey: ["auth"],
     mutationFn: ({ type, body }: MUTATION_TYPE) => {
@@ -33,8 +31,6 @@ const useMutationAuth = () => {
     onSuccess: (res) => {
       if (res.status === 400) {
         alert(res.message);
-      } else {
-        router.push("/login");
       }
     },
   });

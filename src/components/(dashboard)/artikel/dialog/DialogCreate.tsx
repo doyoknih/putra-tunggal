@@ -44,39 +44,39 @@ const DialogCreate = () => {
     }));
   };
 
-  const handleUploadImage = async (file: File) => {
-    const allowedTypes = ["image/png", "image/jpeg"];
-    const maxSize = 1 * 1024 * 1024; // 1MB
-
-    if (!allowedTypes.includes(file.type)) {
-      alert("Hanya file PNG dan JPG yang diperbolehkan.");
-    }
-
-    if (file.size > maxSize) {
-      alert("File terlalu besar! ukuran maxiaml adalah 1MB.");
-      return; // Menghentikan eksekusi jika ukuran file lebih besar dari 1MB
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await uploadImage(formData);
-      const imageUrl = `${imageURL}/${response.data.id}`;
-
-      return imageUrl; // URL gambar yang berhasil di-upload
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      throw new Error("Failed to upload image");
-    }
-  };
-
   const { serviceArticle } = useMutationArticle();
-  const mutationArticle = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const imageUrl = imageFile
-      ? await handleUploadImage(imageFile)
-      : dialog.data?.image;
+
+    let imageUrl = dialog.data?.image ?? null;
+
+    if (imageFile) {
+      const allowedTypes = ["image/png", "image/jpeg"];
+      const maxSize = 1 * 1024 * 1024;
+
+      if (!allowedTypes.includes(imageFile.type)) {
+        alert("Hanya file PNG dan JPG yang diperbolehkan.");
+        return;
+      }
+
+      if (imageFile.size > maxSize) {
+        alert("Ukuran file maksimal 1MB.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", imageFile);
+
+      try {
+        const uploadResponse = await uploadImage(formData);
+        if (uploadResponse?.data) {
+          imageUrl = `${imageURL}/${uploadResponse.data.id}`;
+        }
+      } catch (error) {
+        console.error("Gagal mengupload gambar:", error);
+        return; // Hentikan eksekusi jika upload gagal
+      }
+    }
 
     const payloadArticle: TypeArticle = {
       image: imageUrl,
@@ -113,7 +113,7 @@ const DialogCreate = () => {
       onHide={closeDialog}
       title={dialog.type === "CREATE" ? "Tambah Artikel" : "Update Artikel"}
     >
-      <form onSubmit={mutationArticle} className="flex flex-col gap-3">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div className="w-full h-52 rounded-xl border bg-white shadow-1 overflow-hidden mb-2">
           {previewUrl || dialog.data?.image ? (
             <Image

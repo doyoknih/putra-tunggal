@@ -96,21 +96,27 @@ export async function DELETE(req: NextRequest, { params }: any) {
     const { id } = await params;
 
     const user = await prisma.user.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
+      include: { Service: true }, // Ambil data Service yang terkait
     });
 
     if (!user) {
       return ResponseHandler.InvalidData("User not found");
     }
 
+    // Hapus semua Service yang terkait sebelum menghapus User
+    await prisma.service.deleteMany({
+      where: { dokterId: id },
+    });
+
+    // Hapus User setelah Service terhapus
     const deletedUser = await prisma.user.delete({
       where: { id },
     });
 
     return ResponseHandler.deleted(deletedUser);
   } catch (error) {
+    console.error(error);
     return ResponseHandler.serverError();
   }
 }

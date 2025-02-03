@@ -7,8 +7,10 @@ import Link from "next/link";
 import { roleId } from "@/constants/variables";
 import { useMutationAuth } from "@/api/auth/mutations";
 import { Loader } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const FormRegister = () => {
+  const router = useRouter();
   const [payload, setPayload] = React.useState({
     roleId: roleId!,
     email: "",
@@ -36,10 +38,14 @@ const FormRegister = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    await serviceAuth({
+    const res = await serviceAuth({
       type: "regsiter",
       body: payload,
     });
+
+    if (res.status === 201) {
+      router.push("/login");
+    }
   };
 
   return (

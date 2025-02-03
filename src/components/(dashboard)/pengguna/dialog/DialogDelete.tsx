@@ -6,6 +6,7 @@ import { storeDialog } from "@/store/dialog";
 import { useAtom } from "jotai";
 import { Button } from "@/components/ui/button";
 import { useMutationUser } from "@/api/user/mutation";
+import { Loader } from "lucide-react";
 
 const DialogDelete = () => {
   const [dialog, setDialog] = useAtom(storeDialog);
@@ -17,7 +18,7 @@ const DialogDelete = () => {
     }));
   };
 
-  const { serviceUser } = useMutationUser();
+  const { serviceUser, isPending } = useMutationUser();
 
   const handleDelete = async () => {
     await serviceUser({
@@ -37,7 +38,7 @@ const DialogDelete = () => {
           Cancel
         </Button>
         <Button variant={"danger"} onClick={handleDelete}>
-          Delete
+          {isPending ? <Loader /> : "Delete"}
         </Button>
       </div>
     </DialogLayout>

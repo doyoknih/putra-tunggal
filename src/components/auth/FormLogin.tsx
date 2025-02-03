@@ -11,6 +11,7 @@ import { storeIsLogin } from "@/store/isLogin";
 import { useAtom } from "jotai";
 import { getCookies } from "cookies-next";
 import { Loader } from "lucide-react";
+import { useQueryProfile } from "@/api/user/queries";
 
 export const FormLogin = () => {
   const router = useRouter();
@@ -21,6 +22,7 @@ export const FormLogin = () => {
 
   const [_, setIsLogin] = useAtom(storeIsLogin);
   const { serviceAuth, isPending } = useMutationAuth();
+  const { refetch } = useQueryProfile();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,6 +36,7 @@ export const FormLogin = () => {
       setIsLogin(true);
       const cookies = getCookies() as { [key: string]: string };
       const token = cookies.accessToken;
+      refetch();
 
       if (token) {
         try {

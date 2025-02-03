@@ -83,45 +83,56 @@ const DialogCreate = () => {
     });
   };
 
-  const handleUploadImage = async (file: File) => {
-    const allowedTypes = ["image/png", "image/jpeg"];
-    const maxSize = 1 * 1024 * 1024; // 1MB
-
-    if (!allowedTypes.includes(file.type)) {
-      alert("Hanya file PNG dan JPG yang diperbolehkan.");
-    }
-
-    if (file.size > maxSize) {
-      alert("File terlalu besar! ukuran maxiaml adalah 1MB.");
-      return; // Menghentikan eksekusi jika ukuran file lebih besar dari 1MB
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await uploadImage(formData);
-      const imageUrl = `${imageURL}/${response.data.id}`;
-
-      return imageUrl; // URL gambar yang berhasil di-upload
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      throw new Error("Failed to upload image");
-    }
-  };
-
   const { refetch } = useQueryProfile();
   const { serviceAuth } = useMutationAuth();
   const { serviceUser, isPending } = useMutationUser();
-  const mutationArticle = async (e: React.FormEvent<HTMLFormElement>) => {
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const imageUrl = imageFile
-      ? await handleUploadImage(imageFile)
-      : dialog.data?.foto;
+
+    let imageUrl = dialog.data?.foto ?? null; // Default gunakan foto yang ada
+
+    if (imageFile) {
+      const allowedTypes = ["image/png", "image/jpeg"];
+      const maxSize = 1 * 1024 * 1024;
+
+      if (!allowedTypes.includes(imageFile.type)) {
+        alert("Hanya file PNG dan JPG yang diperbolehkan.");
+        return;
+      }
+
+      if (imageFile.size > maxSize) {
+        alert("Ukuran file maksimal 1MB.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", imageFile);
+
+      try {
+        const uploadResponse = await uploadImage(formData);
+        if (uploadResponse?.data) {
+          imageUrl = `${imageURL}/${uploadResponse.data.id}`;
+        }
+      } catch (error) {
+        console.error("Gagal mengupload gambar:", error);
+        return; // Hentikan eksekusi jika upload gagal
+      }
+    }
+
+    // Pastikan harga adalah integer
+    let harga = dialog.data?.harga ?? null; // Mengambil harga dari dialog, misalnya
+    if (harga !== null) {
+      harga = parseInt(harga.toString(), 10); // Konversi menjadi integer
+      if (isNaN(harga)) {
+        alert("Harga harus berupa angka yang valid.");
+        return;
+      }
+    }
 
     const payloadUser: TypeUser = {
       roleId: dialog.data?.roleId ?? null,
-      foto: imageUrl ?? null,
+      foto: imageUrl,
       email: dialog.data?.email ?? null,
       namaLengkap: dialog.data?.namaLengkap ?? null,
       noTlp: dialog.data?.noTlp ?? null,
@@ -130,29 +141,37 @@ const DialogCreate = () => {
       alamat: dialog.data?.alamat ?? null,
       str: dialog?.data.str ?? null,
       password: dialog.data?.password ?? null,
-      Service: dialog.data?.Service ?? [],
+      Service: dialog.data?.Service
+        ? dialog.data.Service.map((service: any) => ({
+            ...service,
+            harga: parseInt(service.harga, 10) || 0, // Pastikan harga adalah integer
+          }))
+        : [],
     };
 
     try {
       if (dialog.type === "CREATE") {
-        // Call create gallery API
-        await serviceAuth({
+        const res = await serviceAuth({
           type: "regsiter",
           body: payloadUser,
         });
-        closeDialog();
+        if (res.status !== 400) {
+          closeDialog();
+          refetch();
+        }
       } else {
-        // Call update gallery API
-        await serviceUser({
+        const res = await serviceUser({
           type: "update",
           body: payloadUser,
           id: dialog.data?.id,
         });
-        closeDialog();
+        if (res.status !== 400) {
+          closeDialog();
+          refetch();
+        }
       }
-      refetch();
     } catch (error) {
-      console.error(error);
+      console.error("Error saat menjalankan mutation:", error);
     }
   };
 
@@ -162,7 +181,7 @@ const DialogCreate = () => {
       onHide={closeDialog}
       title={dialog.type === "CREATE" ? "Tambah Pengguna" : "Update Pengguna"}
     >
-      <form onSubmit={mutationArticle} className="flex flex-col gap-3">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div className="h-52 w-52 rounded-full mx-auto border bg-white shadow-1 overflow-hidden mb-2">
           {previewUrl || dialog.data?.foto ? (
             <Image
@@ -230,8 +249,8 @@ const DialogCreate = () => {
         <div className="w-full flex flex-col gap-1">
           <p>No Telephone</p>
           <Input
+            type="number"
             name="noTlp"
-            id=""
             placeholder="No Telephone"
             value={dialog.data?.noTlp ?? ""}
             onChange={onInputChange}
@@ -272,50 +291,48 @@ const DialogCreate = () => {
             className="border h-32 text-sm shadow-sm rounded-md overflow-hidden p-1 outline-none"
           ></textarea>
         </div>
-        {dataProfile?.role?.role === "Admin" && (
-          <>
-            <div className="flex flex-col gap-1">
-              <p>STR</p>
-              <Input
-                type="text"
-                placeholder="Str"
-                value={dialog.data?.str ?? ""}
-                onChange={onInputChange}
-                name="str"
-                required
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <p>Nama Service</p>
-              <Input
-                type="text"
-                placeholder="Nama Service"
-                value={dialog.data?.Service[0].namaService ?? ""}
-                onChange={onInputChange}
-                name="namaService"
-                required
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <p>Harga</p>
-              <Input
-                type="number"
-                placeholder="Harga"
-                value={dialog.data?.Service[0].harga ?? ""}
-                onChange={onInputChange}
-                name="harga"
-                required
-              />
-            </div>
-          </>
-        )}
+        {dataProfile?.role?.role === "Admin" &&
+          dialog.data?.role?.role !== "User" && (
+            <>
+              <div className="flex flex-col gap-1">
+                <p>STR</p>
+                <Input
+                  type="text"
+                  placeholder="Str"
+                  value={dialog.data?.str ?? ""}
+                  onChange={onInputChange}
+                  name="str"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <p>Nama Service</p>
+                <Input
+                  type="text"
+                  placeholder="Nama Service"
+                  value={dialog.data?.Service?.[0]?.namaService ?? ""}
+                  onChange={onInputChange}
+                  name="namaService"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <p>Harga</p>
+                <Input
+                  type="number"
+                  placeholder="Harga"
+                  value={dialog.data?.Service?.[0]?.harga ?? ""}
+                  onChange={onInputChange}
+                  name="harga"
+                />
+              </div>
+            </>
+          )}
         <div className="flex flex-col gap-1">
           <p>password</p>
           <Input
             type="password"
             name="password"
-            value={dialog.data?.password ?? ""}
             placeholder="Password"
+            value={dialog.data?.password ?? ""}
             onChange={onInputChange}
           />
         </div>

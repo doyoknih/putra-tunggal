@@ -1,7 +1,6 @@
 "use client";
 
 import { useQueryArticles } from "@/api/article/queries";
-import mentalHealthIMG from "@/assets/mental_health.svg";
 import Image from "next/image";
 
 const MentalHealth = () => {
@@ -23,13 +22,15 @@ const MentalHealth = () => {
               {item.title}
             </p>
             <div className="lg:w-[464px] lg:h-[333px] w-full rounded-3xl shadow-md border overflow-hidden">
-              <Image
-                src={mentalHealthIMG}
-                alt=""
-                width={0}
-                height={0}
-                sizes="100vw"
-              />
+              {item.image && (
+                <Image
+                  src={item.image}
+                  alt=""
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                />
+              )}
             </div>
           </div>
         </div>
