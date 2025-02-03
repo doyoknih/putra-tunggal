@@ -13,16 +13,6 @@ jobs:
       matrix:
         node-version: [20.17.0]
 
-    env:
-      DATABASE_URL: ${{secrets.DATABASE_URL}}
-      BASE_URL: ${{secrets.BASE_URL}}
-      NEXT_PUBLIC_BASE_URL: ${{secrets.NEXT_PUBLIC_BASE_URL}}
-      JWT_SECRET: ${{secrets.JWT_SECRET}}
-      NEXT_PUBLIC_ROLE_USER: ${{secrets.NEXT_PUBLIC_ROLE_USER}}
-      NEXT_PUBLIC_IMAGE: ${{secrets.NEXT_PUBLIC_IMAGE}}
-      MIDTRANS_SERVER_KEY: ${{secrets.MIDTRANS_SERVER_KEY}}
-      MIDTRANS_CLIENT_KEY: ${{secrets.MIDTRANS_CLIENT_KEY}}
-
     steps:
       - uses: actions/checkout@v4
 
@@ -42,17 +32,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-
 
-      - name: Set environment variables
-        run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
-          echo "BASE_URL=${{ secrets.BASE_URL }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}" >> $GITHUB_ENV
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_ROLE_USER=${{ secrets.NEXT_PUBLIC_ROLE_USER }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_IMAGE=${{ secrets.NEXT_PUBLIC_IMAGE }}" >> $GITHUB_ENV
-          echo "MIDTRANS_SERVER_KEY=${{ secrets.MIDTRANS_SERVER_KEY }}" >> $GITHUB_ENV
-          echo "MIDTRANS_CLIENT_KEY=${{ secrets.MIDTRANS_CLIENT_KEY }}" >> $GITHUB_ENV
-
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
@@ -60,10 +39,7 @@ jobs:
           cache: "npm"
 
       - run: npm ci --legacy-peer-deps
-      - run: npm run build --if-present
-      - name: Install PM2
-        run: npm install -g pm2
       - name: Change directory
         run: cd /home/doyok/actions-runner/_work/putra-tunggal/putra-tunggal
-      - run: npm run build
+      - run: npm run build --if-present
       - run: pm2 restart 0
