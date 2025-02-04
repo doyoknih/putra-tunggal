@@ -147,13 +147,13 @@ const ChatBox: FC<{ room: RoomType; role: "Dokter" | "User"; h?: string }> = ({
             />
           </div>
         </div>
-        <div className="">
-          <p className="font-semibold">{user?.user.namaLengkap}</p>
+        <p className="font-semibold">{user?.user.namaLengkap}</p>
+        {/* <div className="">
           <div className="flex items-center">
             <GoDotFill className="w-5 h-5 text-[#3EA057]" />
             <p className="text-black text-xs">Online</p>
           </div>
-        </div>
+        </div> */}
       </div>
       <div className="flex flex-col-reverse gap-2 overflow-hidden overflow-y-scroll h-full pb-[4em]">
         {chats.map((chat, index) => (

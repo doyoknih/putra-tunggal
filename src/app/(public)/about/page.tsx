@@ -6,6 +6,8 @@ import Image from "next/image";
 import { FaFacebook, FaInstagram, FaTwitter, FaWhatsapp } from "react-icons/fa";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
+import { PiSigmaFill } from "react-icons/pi";
 const Maps = dynamic(() => import("@/components/Map"), { ssr: false });
 
 const page = () => {
@@ -72,10 +74,28 @@ const page = () => {
             melayani Anda.
           </p>
           <div className="flex items-center gap-10 justify-center">
-            <FaWhatsapp size={52} fill="#25D366" />
-            <FaFacebook size={52} fill="#3B5998" />
-            <FaTwitter size={52} fill="#00ACEE" />
-            <FaInstagram size={52} />
+            <Link href="mailto:Psikologiputratunggal@gmail.com" target="_blank">
+              <Image
+                width={48}
+                height={48}
+                src="https://cdn-icons-png.flaticon.com/128/15047/15047587.png"
+                alt="email"
+              />
+            </Link>
+            <Link href="https://wa.me/081542824697" target="_blank">
+              <FaWhatsapp size={48} fill="#25D366" />
+            </Link>
+            <Link
+              href="https://www.instagram.com/psikologiputratunggal"
+              target="_blank"
+            >
+              <Image
+                width={48}
+                height={48}
+                src="https://cdn-icons-png.flaticon.com/128/15713/15713420.png"
+                alt="email"
+              />
+            </Link>
           </div>
         </div>
         {/* end location */}

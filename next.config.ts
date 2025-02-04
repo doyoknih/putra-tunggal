@@ -18,6 +18,9 @@ const nextConfig: NextConfig = {
       {
         hostname: "democms.byito.dev",
       },
+      {
+        hostname: "cdn-icons-png.flaticon.com",
+      },
     ],
   },
 };
