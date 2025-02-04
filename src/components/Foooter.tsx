@@ -3,6 +3,8 @@ import { FaFacebookF, FaTwitter } from "react-icons/fa6";
 import { ReactNode } from "react";
 import { AiFillInstagram } from "react-icons/ai";
 import { Logo } from "./Logo";
+import Link from "next/link";
+import Image from "next/image";
 
 interface ISosmed {
   children: ReactNode;
@@ -42,19 +44,29 @@ const Footer = () => {
         </div>
         <div className="flex flex-col gap-y-2 w-[231px]">
           <p className="titleContent">Contact</p>
-          <div className="flex items-center gap-x-2">
-            <Sosmed>
-              <FaFacebookF className="w-6 h-6" />
-            </Sosmed>
-            <Sosmed>
-              <FaTwitter className="w-6 h-6" />
-            </Sosmed>
-            <Sosmed>
-              <FaWhatsapp className="w-7 h-7" />
-            </Sosmed>
-            <Sosmed>
-              <AiFillInstagram className="w-6 h-6" />
-            </Sosmed>
+          <div className="flex items-center gap-x-5">
+            <Link href="mailto:Psikologiputratunggal@gmail.com" target="_blank">
+              <Image
+                width={32}
+                height={32}
+                src="https://cdn-icons-png.flaticon.com/128/15047/15047587.png"
+                alt="email"
+              />
+            </Link>
+            <Link href="https://wa.me/081542824697" target="_blank">
+              <FaWhatsapp size={32} fill="#25D366" />
+            </Link>
+            <Link
+              href="https://www.instagram.com/psikologiputratunggal"
+              target="_blank"
+            >
+              <Image
+                width={32}
+                height={32}
+                src="https://cdn-icons-png.flaticon.com/128/15713/15713420.png"
+                alt="email"
+              />
+            </Link>
           </div>
         </div>
       </div>

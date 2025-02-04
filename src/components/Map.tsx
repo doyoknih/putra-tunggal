@@ -12,7 +12,7 @@ const CustomIcon = L.icon({
 
 const Maps = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const position: LatLngTuple = [-7.435018404128583, 109.24912478085912];
+  const position: LatLngTuple = [-7.44222679266465, 109.24450975229654];
 
   useEffect(() => {
     const container = document.getElementById("map") as HTMLDivElement;
