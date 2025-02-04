@@ -20,8 +20,40 @@ const TableRiwayat = ({
   ];
   const { dataHistories = [], isLoading } = useQueryHistories();
 
-  // Filter data berdasarkan namaLengkap dan jenis layanan
-  const filteredHistories = dataHistories.filter((item) => {
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  // Pisahkan layanan Online & Non-Online
+  const onlineData = dataHistories
+    .filter((item) => item.layanan === "Online")
+    .sort((a, b) =>
+      moment(a.order?.createdAt).diff(moment(b.order?.createdAt))
+    );
+
+  const nonOnlineData = dataHistories.filter(
+    (item) => item.layanan !== "Online"
+  );
+
+  // Filter layanan Online berdasarkan rentang waktu 1 jam per userId
+  const filteredOnlineData: typeof onlineData = [];
+  const seenUsers: Record<string, moment.Moment> = {};
+
+  onlineData.forEach((item) => {
+    const userId = item.userId;
+    const createdAt = moment(item.order?.createdAt);
+
+    if (!seenUsers[userId] || createdAt.diff(seenUsers[userId], "hours") >= 1) {
+      filteredOnlineData.push(item);
+      seenUsers[userId] = createdAt;
+    }
+  });
+
+  // Gabungkan hasil filter Online & Non-Online
+  const combinedData = [...filteredOnlineData, ...nonOnlineData];
+
+  // Filter berdasarkan search dan jenis layanan
+  const finalData = combinedData.filter((item) => {
     const matchName = item.user?.namaLengkap
       ?.toLowerCase()
       .includes(searchValue.toLowerCase());
@@ -30,10 +62,6 @@ const TableRiwayat = ({
 
     return matchName && matchService;
   });
-
-  if (isLoading) {
-    return <p>Loading...</p>;
-  }
 
   return (
     <div className="border rounded-2xl overflow-hidden">
@@ -48,7 +76,7 @@ const TableRiwayat = ({
           </tr>
         </thead>
         <tbody>
-          {filteredHistories.map((item, index) => (
+          {finalData.map((item, index) => (
             <tr key={index} className="text-center border-b-2">
               <td className="py-2">{index + 1}</td>
               <td className="py-2">{item.user?.namaLengkap}</td>

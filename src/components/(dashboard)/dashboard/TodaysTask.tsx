@@ -8,14 +8,41 @@ import { useQueryProfile } from "@/api/user/queries";
 
 export const TodaysTask = () => {
   const { dataProfile } = useQueryProfile();
-
   const { dataHistories } = useQueryHistories();
 
   const today = moment().startOf("day");
-  const todayData = dataHistories?.filter((item) => {
-    const orderDate = moment(item?.createdAt).startOf("day");
-    return orderDate.isSame(today);
+
+  // Pisahkan data menjadi Online & Non-Online
+  const onlineData = dataHistories
+    ?.filter((item) => {
+      const orderDate = moment(item?.createdAt);
+      return orderDate.isSame(today, "day") && item.layanan === "Online";
+    })
+    .sort((a, b) => moment(a.createdAt).diff(moment(b.createdAt))); // Urutkan berdasarkan waktu
+
+  const nonOnlineData = dataHistories?.filter(
+    (item) =>
+      item.layanan !== "Online" && moment(item?.createdAt).isSame(today, "day")
+  );
+
+  // Menyimpan data Online dalam rentang 1 jam
+  const filteredOnlineData: typeof onlineData = [];
+  const seenUsers: Record<string, moment.Moment> = {};
+
+  onlineData?.forEach((item) => {
+    const userId = item.userId;
+    const createdAt = moment(item.createdAt);
+
+    if (!seenUsers[userId] || createdAt.diff(seenUsers[userId], "hours") >= 1) {
+      filteredOnlineData.push(item);
+      seenUsers[userId] = createdAt;
+    }
   });
+
+  // Gabungkan data Online yang sudah difilter dengan Non-Online yang tetap ditampilkan semua
+  const finalData = [...filteredOnlineData, ...(nonOnlineData || [])];
+
+  console.log("today data", finalData);
 
   return (
     <Card className="rounded-xl p-5">
@@ -40,7 +67,7 @@ export const TodaysTask = () => {
           </tr>
         </thead>
         <tbody>
-          {todayData?.map((item, index) => (
+          {finalData?.map((item, index) => (
             <tr key={index} className="text-center">
               <td className="py-2">
                 <div

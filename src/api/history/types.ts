@@ -11,6 +11,7 @@ type TypeOrderItem = {
 
 type TypeHistory = {
   id?: string;
+  userId: string;
   orderId?: string;
   serviceId?: string;
   qty?: number;
